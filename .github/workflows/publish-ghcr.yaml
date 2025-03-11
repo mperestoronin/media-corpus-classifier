@@ -6,10 +6,21 @@ on:
 jobs:
   build_and_publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write 
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Build and push the image
+      - uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
         run: |
-          docker login --username mperestoronin --password ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           docker build . --tag ghcr.io/mperestoronin/classifier:latest
           docker push ghcr.io/mperestoronin/classifier:latest
