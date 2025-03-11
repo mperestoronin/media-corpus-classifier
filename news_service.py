@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 KAFKA_TOPIC = os.getenv('KAFKA_TOPIC', 'unclassified_news')
-KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9092')
+KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'kafka:9092')
 LLM_API_URL = os.getenv('LLM_API_URL', 'http://ai.nt.fyi/api/generate')
 ADD_DOCUMENT_BACKEND_API_URL = os.getenv('ADD_DOCUMENT_BACKEND_API_URL', 'http://backend-backend-backend-url/api/news')
 LLM_API_AUTH_USER = os.getenv('LLM_API_AUTH_USER')
@@ -100,7 +100,7 @@ def classify_news(news):
             response.raise_for_status()
             classification_result = response.json()
             validated_tags = validate_and_extract_tags(classification_result, tags)
-            if validated_tags is not None:
+            if validated_tags and len(validated_tags) > 0:
                 logger.info("Классификация получена с моделью %s: %s", model, validated_tags)
                 return validated_tags
             else:
