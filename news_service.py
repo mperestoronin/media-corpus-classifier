@@ -15,7 +15,10 @@ logger = logging.getLogger(__name__)
 KAFKA_TOPIC = os.getenv('KAFKA_TOPIC', 'unclassified_news')
 KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9092')
 LLM_API_URL = os.getenv('LLM_API_URL', 'http://ai.nt.fyi/api/generate')
-BACKEND_API_URL = os.getenv('BACKEND_API_URL', 'http://backend-backend-backend-url/api/news')
+ADD_DOCUMENT_BACKEND_API_URL = os.getenv('ADD_DOCUMENT_BACKEND_API_URL', 'http://backend-backend-backend-url/api/news')
+LLM_API_AUTH_USER = os.getenv('LLM_API_AUTH_USER')
+LLM_API_AUTH_PASS = os.getenv('LLM_API_AUTH_PASS')
+
 # Список допустимых тегов
 tags = ['Экономика', 'Кредит', 'IT', 'Зарплаты', 'Кибербезопасность', 'Спорт', 'Футбол', 'СБП']
 
@@ -92,7 +95,7 @@ def classify_news(news):
             response = requests.post(
                 LLM_API_URL,
                 json=payload,
-                auth=("ai", "northgard")
+                auth=(LLM_API_AUTH_USER, LLM_API_AUTH_PASS)
             )
             response.raise_for_status()
             classification_result = response.json()
@@ -129,7 +132,7 @@ def generate_summary(news):
         response = requests.post(
             LLM_API_URL,
             json=payload,
-            auth=("ai", "northgard")
+            auth=(LLM_API_AUTH_USER, LLM_API_AUTH_PASS)
         )
         response.raise_for_status()
         summary_result = response.json()
@@ -149,7 +152,7 @@ def send_to_backend(news):
     Отправляет новость с результатами классификации на backend.
     """
     try:
-        response = requests.post(BACKEND_API_URL, json=news)
+        response = requests.post(ADD_DOCUMENT_BACKEND_API_URL, json=news)
         response.raise_for_status()
         logger.info("Данные успешно отправлены на backend.")
     except Exception as e:
@@ -168,12 +171,10 @@ def main():
         
         # Если новость прошла классификацию (теги отличны от ["не определено"]),
         # генерируем новое краткое содержание с помощью LLM 
-        # (логика тут такая, что если мы получили не опередено, то модель не может нормально работать с этим тесктом 
-        # (например потому-что он слишком длинный), поэтому нет смысла работать с ним еще раз)
         if "не определено" not in validated_tags:
             new_summary = generate_summary(news)
             news['summary'] = new_summary
-        #TODO закоменчено, пока нет бекенда, не забыть раскоментить    
+        # TODO: отправка на backend - раскомментировать, когда backend будет готов
         # send_to_backend(news)
         logger.info("Новость: %s", news.get("title"))
         logger.info("Теги: %s", news.get("tags"))
