@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 KAFKA_TOPIC = os.getenv('KAFKA_TOPIC', 'unclassified_news')
 KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'kafka:9092')
 LLM_API_URL = os.getenv('LLM_API_URL', 'http://ai.nt.fyi/api/generate')
-ADD_DOCUMENT_BACKEND_API_URL = os.getenv('ADD_DOCUMENT_BACKEND_API_URL', 'http://backend-backend-backend-url/api/news')
+ADD_DOCUMENT_BACKEND_API_URL = os.getenv('ADD_DOCUMENT_BACKEND_API_URL', 'http://app:8081/documents/create')
 LLM_API_AUTH_USER = os.getenv('LLM_API_AUTH_USER')
 LLM_API_AUTH_PASS = os.getenv('LLM_API_AUTH_PASS')
 
@@ -174,8 +174,7 @@ def main():
         if "не определено" not in validated_tags:
             new_summary = generate_summary(news)
             news['summary'] = new_summary
-        # TODO: отправка на backend - раскомментировать, когда backend будет готов
-        # send_to_backend(news)
+        send_to_backend(news)
         logger.info("Новость: %s", news.get("title"))
         logger.info("Теги: %s", news.get("tags"))
         logger.info("Краткое содержание: %s", news.get("summary"))

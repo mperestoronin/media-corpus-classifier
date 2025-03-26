@@ -57,6 +57,18 @@ services:
     networks:
       - shared_network
 
+  digest_service:
+    image: ghcr.io/mperestoronin/digest-creator:latest
+    container_name: digest_service
+    env_file:
+      - .env
+    depends_on:
+      - kafka
+    ports:
+      - "5000:5000"
+    networks:
+      - shared_network
+
 networks:
   shared_network:
     external: true
