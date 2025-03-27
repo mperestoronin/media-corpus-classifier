@@ -153,6 +153,7 @@ def send_to_backend(news):
     """
     try:
         print(news)
+        print(news['title'] + " news symbol count: " + len(news['text']))
         response = requests.post(ADD_DOCUMENT_BACKEND_API_URL, json=news)
         response.raise_for_status()
         logger.info("Данные успешно отправлены на backend.")
