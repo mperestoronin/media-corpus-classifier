@@ -152,6 +152,7 @@ def send_to_backend(news):
     Отправляет новость с результатами классификации на backend.
     """
     try:
+        print(news)
         response = requests.post(ADD_DOCUMENT_BACKEND_API_URL, json=news)
         response.raise_for_status()
         logger.info("Данные успешно отправлены на backend.")
