@@ -123,7 +123,7 @@ def classify_news(news):
             logger.error("Ошибка при вызове LLM API с моделью %s: %s", model, e)
 
     # Если ни одна попытка не дала валидного результата, возвращаем дефолтное значение
-    return ["не определено"]
+    return ["Не определено"]
 
 def generate_summary(news):
     """
@@ -184,9 +184,9 @@ def main():
         validated_tags = classify_news(news)
         news['tags'] = validated_tags
         
-        # Если новость прошла классификацию (теги отличны от ["не определено"]),
+        # Если новость прошла классификацию (теги отличны от ["Не определено"]),
         # генерируем новое краткое содержание с помощью LLM 
-        if "не определено" not in validated_tags:
+        if "Не определено" not in validated_tags:
             new_summary = generate_summary(news)
             news['summary'] = new_summary
         send_to_backend(news)
