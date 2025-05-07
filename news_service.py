@@ -15,11 +15,11 @@ logger = logging.getLogger(__name__)
 KAFKA_TOPIC = os.getenv('KAFKA_TOPIC', 'unclassified_news')
 KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'kafka:9092')
 LLM_API_URL = os.getenv('LLM_API_URL', 'http://ai.nt.fyi/api/generate')
-ADD_DOCUMENT_BACKEND_API_URL = os.getenv('ADD_DOCUMENT_BACKEND_API_URL', 'http://app:8081/documents/create')
+ADD_DOCUMENT_BACKEND_API_URL = os.getenv('ADD_DOCUMENT_BACKEND_API_URL')
 LLM_API_AUTH_USER = os.getenv('LLM_API_AUTH_USER')
 LLM_API_AUTH_PASS = os.getenv('LLM_API_AUTH_PASS')
+BACKEND_SECRET_KEY = os.getenv('BACKEND_SECRET_KEY')
 
-# Список допустимых тегов
 tags = [
     "Политика", "Внутренняя политика", "Внешняя политика", "Дипломатия", "Законы", "Выборы", "Политические партии",
     "Геополитика", "Экономика", "Макроэкономика", "Финансы", "Банки", "Трансграничные переводы", "Кредитование", "Гранты",
@@ -73,7 +73,7 @@ def validate_and_extract_tags(classification_result, known_tags):
     """
     try:
         response_str = classification_result.get("response", "")
-        # Пробуем распарсить строку как список с помощью безопасного ast.literal_eval
+        # пробуем распарсить строку как список с помощью безопасного ast.literal_eval
         tags_list = ast.literal_eval(response_str)
         if not isinstance(tags_list, list):
             return None
@@ -122,7 +122,6 @@ def classify_news(news):
         except Exception as e:
             logger.error("Ошибка при вызове LLM API с моделью %s: %s", model, e)
 
-    # Если ни одна попытка не дала валидного результата, возвращаем дефолтное значение
     return ["Не определено"]
 
 def generate_summary(news):
@@ -166,7 +165,10 @@ def send_to_backend(news):
     Отправляет новость с результатами классификации на backend.
     """
     try:
-        print(news)
+        headers = {}
+        if BACKEND_SECRET_KEY:
+            headers['Authorization'] = f'Bearer {BACKEND_SECRET_KEY}'
+        response = requests.post(ADD_DOCUMENT_BACKEND_API_URL, json=news, headers=headers)
         response = requests.post(ADD_DOCUMENT_BACKEND_API_URL, json=news)
         response.raise_for_status()
         logger.info("Данные успешно отправлены на backend.")

@@ -7,8 +7,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
+    expose:
+      - "2181"
     networks:
       - shared_network
 
@@ -24,13 +24,13 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true' # при реальном развертывании это нужно не забыть убать и настроить создание топиков вручную
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_REPLICA_FETCH_MAX_BYTES: 200000000
       KAFKA_FETCH_MAX_BYTES: 200000000
       KAFKA_MAX_REQUEST_SIZE: 2000000000  
       KAFKA_MESSAGE_MAX_BYTES: 2000000000 
-    ports:
-      - "9092:9092"
+    expose:
+      - "9092"
     networks:
       - shared_network
 
@@ -39,15 +39,15 @@ services:
     container_name: kafdrop
     depends_on:
       - kafka
-    ports:
-      - "9000:9000"
     environment:
       KAFKA_BROKERCONNECT: kafka:9092
       JVM_OPTS: "-Xms32M -Xmx64M"
+    expose:
+      - "9000"
     networks:
       - shared_network
 
-  news_service:
+  news-service:
     image: ghcr.io/mperestoronin/classifier:latest
     container_name: news_service
     env_file:
@@ -57,13 +57,13 @@ services:
     networks:
       - shared_network
 
-  digest_service:
+  digest-service:
     image: ghcr.io/mperestoronin/digest-creator:latest
     container_name: digest_service
     env_file:
       - .env
-    ports:
-      - "5000:5000"
+    expose:
+      - "5000"
     networks:
       - shared_network
 
@@ -72,8 +72,16 @@ services:
     container_name: mailman
     env_file:
       - .env
+    expose:
+      - "5001"
+    networks:
+      - shared_network
+
+  frontend:
+    image: ghcr.io/mperestoronin/frontend:latest
+    container_name: frontend
     ports:
-      - "5001:5001"
+      - "80:80"
     networks:
       - shared_network
 
