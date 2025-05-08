@@ -169,7 +169,6 @@ def send_to_backend(news):
         if BACKEND_SECRET_KEY:
             headers['Authorization'] = f'Bearer {BACKEND_SECRET_KEY}'
         response = requests.post(ADD_DOCUMENT_BACKEND_API_URL, json=news, headers=headers)
-        response = requests.post(ADD_DOCUMENT_BACKEND_API_URL, json=news)
         response.raise_for_status()
         logger.info("Данные успешно отправлены на backend.")
     except Exception as e:
