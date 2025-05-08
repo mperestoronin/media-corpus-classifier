@@ -81,7 +81,7 @@ services:
     image: ghcr.io/mperestoronin/frontend:latest
     container_name: frontend
     ports:
-      - "80:80"
+      - "8082:80"
     networks:
       - shared_network
 
