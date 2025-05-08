@@ -24,3 +24,13 @@ jobs:
         run: |
           docker build . --tag ghcr.io/mperestoronin/classifier:latest
           docker push ghcr.io/mperestoronin/classifier:latest
+      - name: Redeploy compose stack
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          script: |
+            whoami
+            ls -al
