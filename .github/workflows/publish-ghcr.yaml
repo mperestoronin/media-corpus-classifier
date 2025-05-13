@@ -26,6 +26,7 @@ jobs:
           docker push ghcr.io/mperestoronin/classifier:latest
 
   deploy:
+    needs: build_and_publish
     env:
       REPO: ${{ github.event.repository.name }}
     runs-on: ubuntu-latest
