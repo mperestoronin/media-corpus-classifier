@@ -42,9 +42,11 @@ def create_consumer():
             consumer = KafkaConsumer(
                 KAFKA_TOPIC,
                 bootstrap_servers=[KAFKA_BOOTSTRAP_SERVERS],
-                auto_offset_reset='earliest',  # или 'latest'
+                auto_offset_reset='latest', 
                 group_id='news_classification_group',
-                value_deserializer=lambda m: json.loads(m.decode('utf-8'))
+                value_deserializer=lambda m: json.loads(m.decode('utf-8')),
+                enable_auto_commit=False,
+                max_poll_interval_ms=900000,
             )
             logger.info("Успешно создан KafkaConsumer")
             return consumer
@@ -194,6 +196,7 @@ def main():
         logger.info("Новость: %s", news.get("title"))
         logger.info("Теги: %s", news.get("tags"))
         logger.info("Краткое содержание: %s", news.get("summary"))
+        consumer.commit()
 
 if __name__ == "__main__":
     main()
