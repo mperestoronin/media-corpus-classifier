@@ -120,7 +120,7 @@ def classify_news(news):
                 logger.info("Классификация получена с моделью %s: %s", model, validated_tags)
                 return validated_tags
             else:
-                logger.error("Неверный формат ответа от модели %s: %s", model, classification_result)
+                logger.error("Неверный формат ответа от модели %s", model)
         except Exception as e:
             logger.error("Ошибка при вызове LLM API с моделью %s: %s", model, e)
 
@@ -195,7 +195,6 @@ def main():
         send_to_backend(news)
         logger.info("Новость: %s", news.get("title"))
         logger.info("Теги: %s", news.get("tags"))
-        logger.info("Краткое содержание: %s", news.get("summary"))
         consumer.commit()
 
 if __name__ == "__main__":
