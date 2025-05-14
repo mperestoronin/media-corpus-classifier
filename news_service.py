@@ -36,6 +36,15 @@ tags = [
     "Удаленка", "Рынок труда", "Цены", "Зарплаты", "Социальные выплаты", "Тарифы", "Налоги", "Реформа", "Инновации", "Тренд", "Инцидент"
 ]
 
+def safe_json_deserializer(m):
+    if m in (None, b''):
+        return None  
+    try:
+        return json.loads(m.decode('utf-8'))
+    except json.JSONDecodeError:
+        logger.warning("Невалидный JSON: %s", m[:100])
+        return None
+
 def create_consumer():
     while True:
         try:
@@ -57,15 +66,6 @@ def create_consumer():
 consumer = create_consumer()
 
 running = True
-
-def safe_json_deserializer(m):
-    if m in (None, b''):
-        return None  
-    try:
-        return json.loads(m.decode('utf-8'))
-    except json.JSONDecodeError:
-        logger.warning("Невалидный JSON: %s", m[:100])
-        return None
 
 def signal_handler(sig, frame):
     global running
