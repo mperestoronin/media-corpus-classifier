@@ -44,7 +44,7 @@ def create_consumer():
                 bootstrap_servers=[KAFKA_BOOTSTRAP_SERVERS],
                 auto_offset_reset='latest', 
                 group_id='news_classification_group',
-                value_deserializer=lambda m: json.loads(m.decode('utf-8')),
+                value_deserializer=safe_json_deserializer,
                 enable_auto_commit=False,
                 max_poll_interval_ms=900000,
             )
@@ -57,6 +57,15 @@ def create_consumer():
 consumer = create_consumer()
 
 running = True
+
+def safe_json_deserializer(m):
+    if m in (None, b''):
+        return None  
+    try:
+        return json.loads(m.decode('utf-8'))
+    except json.JSONDecodeError:
+        logger.warning("Невалидный JSON: %s", m[:100])
+        return None
 
 def signal_handler(sig, frame):
     global running
@@ -182,6 +191,9 @@ def main():
         if not running:
             break
         news = message.value
+        if news is None:
+            consumer.commit()
+            continue
         logger.info("Получена новость: %s", news.get("title", "Без заголовка"))
         
         validated_tags = classify_news(news)
