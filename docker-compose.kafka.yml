@@ -7,6 +7,7 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+      KAFKA_LOG4J_LOGGERS: "org.apache.zookeeper=INFO,org.I0Itec.zkclient=INFO"
     expose:
       - "2181"
     networks:
@@ -29,6 +30,8 @@ services:
       KAFKA_FETCH_MAX_BYTES: 200000000
       KAFKA_MAX_REQUEST_SIZE: 2000000000  
       KAFKA_MESSAGE_MAX_BYTES: 2000000000 
+      KAFKA_LOG4J_ROOT_LOGLEVEL: INFO
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,kafka.producer.async.DefaultEventHandler=INFO,state.change.logger=INFO"
     expose:
       - "9092"
     networks:
